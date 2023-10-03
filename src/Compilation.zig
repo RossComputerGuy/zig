@@ -6509,7 +6509,7 @@ fn zigBackend(target: std.Target, use_llvm: bool) std.builtin.CompilerBackend {
     };
 }
 
-pub fn generateBuiltinZigSource(comp: *Compilation, allocator: Allocator) Allocator.Error![:0]u8 {
+pub fn generateBuiltinZigSource(comp: *Compilation, allocator: Allocator) error{ OutOfMemory, InvalidPageSize }![:0]u8 {
     const tracy_trace = trace(@src());
     defer tracy_trace.end();
 
@@ -6657,6 +6657,7 @@ pub fn generateBuiltinZigSource(comp: *Compilation, allocator: Allocator) Alloca
         \\    .os = os,
         \\    .abi = abi,
         \\    .ofmt = object_format,
+        \\    .page_size = {?},
         \\}};
         \\pub const object_format = std.Target.ObjectFormat.{};
         \\pub const mode = std.builtin.OptimizeMode.{};
@@ -6672,6 +6673,7 @@ pub fn generateBuiltinZigSource(comp: *Compilation, allocator: Allocator) Alloca
         \\pub const omit_frame_pointer = {};
         \\
     , .{
+        target.page_size orelse (if (comp.bin_file.options.is_native_os and comp.bin_file.options.is_native_abi) std.heap.pageSize() else null),
         std.zig.fmtId(@tagName(target.ofmt)),
         std.zig.fmtId(@tagName(comp.bin_file.options.optimize_mode)),
         link_libc,

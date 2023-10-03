@@ -334,3 +334,7 @@ pub const ucontext_t = extern struct {
 };
 
 pub const Elf_Symndx = u32;
+
+pub const SC = struct {
+    pub const PAGESIZE = 30;
+};

@@ -45,6 +45,9 @@ dynamic_linker: DynamicLinker = DynamicLinker{},
 /// `null` means default for the cpu/arch/os combo.
 ofmt: ?Target.ObjectFormat = null,
 
+/// `null` means to dynamically get the page size or use the platform default.
+page_size: ?usize = null,
+
 pub const CpuModel = union(enum) {
     /// Always native
     native,
@@ -81,6 +84,7 @@ pub fn fromTarget(target: Target) CrossTarget {
             target.os.version_range.linux.glibc
         else
             null,
+        .page_size = target.page_size,
     };
     result.updateOsVersionRange(target.os);
 
@@ -177,6 +181,7 @@ pub fn toTarget(self: CrossTarget) Target {
         .os = self.getOs(),
         .abi = self.getAbi(),
         .ofmt = self.getObjectFormat(),
+        .page_size = self.page_size,
     };
 }
 

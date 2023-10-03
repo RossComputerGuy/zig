@@ -8,6 +8,7 @@ pub const Target = struct {
     os: Os,
     abi: Abi,
     ofmt: ObjectFormat,
+    page_size: ?usize = null,
 
     pub const Os = struct {
         tag: Tag,
@@ -455,6 +456,10 @@ pub const Target = struct {
                 .other,
                 => false,
             };
+        }
+
+        pub fn compare(self: Os, other: Os) bool {
+            return self.tag == other.tag and self.isAtLeast(other.tag, other.getVersionRange());
         }
     };
 
@@ -1390,7 +1395,15 @@ pub const Target = struct {
         pub fn baseline(arch: Arch) Cpu {
             return Model.baseline(arch).toCpu(arch);
         }
+
+        pub fn compare(self: Cpu, other: Cpu) bool {
+            return self.arch == other.arch and std.mem.eql(u8, self.model.name, other.model.name) and self.features.eql(other.features);
+        }
     };
+
+    pub fn useHostPageSize(self: Target, other: Target) bool {
+        return self.cpu.compare(other.cpu) and self.os.compare(other.os);
+    }
 
     pub fn zigTriple(self: Target, allocator: mem.Allocator) ![]u8 {
         return std.zig.CrossTarget.fromTarget(self).zigTriple(allocator);

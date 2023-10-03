@@ -413,3 +413,7 @@ pub const rlimit_resource = enum(c_int) {
 
     _,
 };
+
+pub const SC = struct {
+    pub const PAGESIZE = 30;
+};
