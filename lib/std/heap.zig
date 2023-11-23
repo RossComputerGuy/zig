@@ -584,7 +584,8 @@ pub fn pageSize() usize {
     if (page_size) |pg_size| return pg_size;
     page_size = switch (builtin.os.tag) {
         .linux => if (builtin.link_libc) @intCast(std.c.sysconf(std.os.linux.SC.PAGESIZE)) else std.os.linux.getauxval(std.elf.AT_PAGESZ),
-        else => mem.page_size,
+        .macos => std.os.darwin.machTaskForSelf().getPageSize() catch mem.page_size,
+        else => if (builtin.link_libc and @hasDecl(std.c, "getpagesize")) std.c.getpagesize() else mem.page_size,
     };
     return page_size.?;
 }
