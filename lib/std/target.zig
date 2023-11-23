@@ -1324,6 +1324,7 @@ pub const Target = struct {
             name: []const u8,
             llvm_name: ?[:0]const u8,
             features: Feature.Set,
+            page_size: ?usize = null,
 
             pub fn toCpu(model: *const Model, arch: Arch) Cpu {
                 var features = model.features;
@@ -2613,6 +2614,10 @@ pub const Target = struct {
                 => 16,
             },
         );
+    }
+
+    pub inline fn getPageSize(self: Target) ?usize {
+        return self.cpu.model.page_size orelse self.page_size;
     }
 };
 

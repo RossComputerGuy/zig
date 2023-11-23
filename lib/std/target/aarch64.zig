@@ -1644,6 +1644,7 @@ pub const cpu = struct {
             .zcm,
             .zcz,
         }),
+        .page_size = 16 * 1024, // 16k
     };
     pub const apple_a15 = CpuModel{
         .name = "apple_a15",
@@ -1801,6 +1802,7 @@ pub const cpu = struct {
             .zcm,
             .zcz,
         }),
+        .page_size = 16 * 1024, // 16k
     };
     pub const apple_m2 = CpuModel{
         .name = "apple_m2",
@@ -1824,6 +1826,7 @@ pub const cpu = struct {
             .zcm,
             .zcz,
         }),
+        .page_size = 16 * 1024, // 16k
     };
     pub const apple_s4 = CpuModel{
         .name = "apple_s4",

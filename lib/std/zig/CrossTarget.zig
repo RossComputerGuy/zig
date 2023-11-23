@@ -72,6 +72,10 @@ pub const SemanticVersion = std.SemanticVersion;
 
 pub const DynamicLinker = Target.DynamicLinker;
 
+pub inline fn getPageSize(self: CrossTarget) ?usize {
+    return self.getCpuModel().page_size orelse self.page_size;
+}
+
 pub fn fromTarget(target: Target) CrossTarget {
     var result: CrossTarget = .{
         .cpu_arch = target.cpu.arch,
@@ -84,7 +88,7 @@ pub fn fromTarget(target: Target) CrossTarget {
             target.os.version_range.linux.glibc
         else
             null,
-        .page_size = target.page_size,
+        .page_size = target.getPageSize(),
     };
     result.updateOsVersionRange(target.os);
 
@@ -181,7 +185,7 @@ pub fn toTarget(self: CrossTarget) Target {
         .os = self.getOs(),
         .abi = self.getAbi(),
         .ofmt = self.getObjectFormat(),
-        .page_size = self.page_size,
+        .page_size = self.getPageSize(),
     };
 }
 

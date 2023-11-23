@@ -125,6 +125,10 @@ pub fn cmdTargets(
         try jws.objectField("triple");
         try jws.write(triple);
     }
+
+    try jws.objectField("page_size");
+    try jws.write(native_target.getPageSize());
+
     {
         try jws.objectField("cpu");
         try jws.beginObject();

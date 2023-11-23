@@ -6673,7 +6673,7 @@ pub fn generateBuiltinZigSource(comp: *Compilation, allocator: Allocator) error{
         \\pub const omit_frame_pointer = {};
         \\
     , .{
-        target.page_size orelse (if (comp.bin_file.options.is_native_os and comp.bin_file.options.is_native_abi) std.heap.pageSize() else null),
+        target.getPageSize() orelse (if (comp.bin_file.options.is_native_os and comp.bin_file.options.is_native_abi) std.heap.pageSize() else null),
         std.zig.fmtId(@tagName(target.ofmt)),
         std.zig.fmtId(@tagName(comp.bin_file.options.optimize_mode)),
         link_libc,
