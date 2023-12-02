@@ -1,0 +1,31 @@
+const std = @import("../std.zig");
+const CpuFeature = std.Target.Cpu.Feature;
+const CpuModel = std.Target.Cpu.Model;
+
+pub const Feature = enum {};
+
+pub const featureSet = CpuFeature.feature_set_fns(Feature).featureSet;
+pub const featureSetHas = CpuFeature.feature_set_fns(Feature).featureSetHas;
+pub const featureSetHasAny = CpuFeature.feature_set_fns(Feature).featureSetHasAny;
+pub const featureSetHasAll = CpuFeature.feature_set_fns(Feature).featureSetHasAll;
+
+pub const all_features = blk: {
+    @setEvalBranchQuota(10000);
+    const len = @typeInfo(Feature).Enum.fields.len;
+    std.debug.assert(len <= CpuFeature.Set.needed_bit_count);
+    var result: [len]CpuFeature = undefined;
+    const ti = @typeInfo(Feature);
+    for (&result, 0..) |*elem, i| {
+        elem.index = i;
+        elem.name = ti.Enum.fields[i].name;
+    }
+    break :blk result;
+};
+
+pub const cpu = struct {
+    pub const generic = CpuModel{
+        .name = "generic",
+        .llvm_name = null,
+        .features = featureSet(&[_]Feature{}),
+    };
+};

@@ -5996,6 +5996,7 @@ pub fn atomicPtrAlignment(
 ) AtomicPtrAlignmentError!Alignment {
     const target = mod.getTarget();
     const max_atomic_bits: u16 = switch (target.cpu.arch) {
+        .ue2 => return .none,
         .avr,
         .msp430,
         .spu_2,

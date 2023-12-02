@@ -485,6 +485,7 @@ pub const Target = struct {
     pub const wasm = @import("target/wasm.zig");
     pub const x86 = @import("target/x86.zig");
     pub const xtensa = @import("target/xtensa.zig");
+    pub const ue2 = @import("target/ue2.zig");
 
     pub const Abi = enum {
         none,
@@ -906,6 +907,7 @@ pub const Target = struct {
             renderscript32,
             renderscript64,
             ve,
+            ue2,
             // Stage1 currently assumes that architectures above this comment
             // map one-to-one with the ZigLLVM_ArchType enum.
             spu_2,
@@ -1076,6 +1078,7 @@ pub const Target = struct {
                     .spirv64 => .NONE,
                     .loongarch32 => .NONE,
                     .loongarch64 => .NONE,
+                    .ue2 => .NONE,
                 };
             }
 
@@ -1141,6 +1144,7 @@ pub const Target = struct {
                     .spirv64 => .Unknown,
                     .loongarch32 => .Unknown,
                     .loongarch64 => .Unknown,
+                    .ue2 => .Unknown,
                 };
             }
 
@@ -1210,6 +1214,7 @@ pub const Target = struct {
                     .tce,
                     .lanai,
                     .s390x,
+                    .ue2,
                     => .big,
                 };
             }
@@ -1246,6 +1251,7 @@ pub const Target = struct {
                     .nvptx, .nvptx64 => "nvptx",
                     .wasm32, .wasm64 => "wasm",
                     .spirv32, .spirv64 => "spirv",
+                    .ue2 => "ue-2",
                     else => @tagName(arch),
                 };
             }
@@ -1275,6 +1281,7 @@ pub const Target = struct {
                     .nvptx, .nvptx64 => &nvptx.all_features,
                     .ve => &ve.all_features,
                     .wasm32, .wasm64 => &wasm.all_features,
+                    .ue2 => &ue2.all_features,
 
                     else => &[0]Cpu.Feature{},
                 };
@@ -1305,6 +1312,7 @@ pub const Target = struct {
                     .nvptx, .nvptx64 => comptime allCpusFromDecls(nvptx.cpu),
                     .ve => comptime allCpusFromDecls(ve.cpu),
                     .wasm32, .wasm64 => comptime allCpusFromDecls(wasm.cpu),
+                    .ue2 => comptime allCpusFromDecls(ue2.cpu),
 
                     else => &[0]*const Model{},
                 };
@@ -1372,6 +1380,7 @@ pub const Target = struct {
                     .nvptx, .nvptx64 => &nvptx.cpu.sm_20,
                     .ve => &ve.cpu.generic,
                     .wasm32, .wasm64 => &wasm.cpu.generic,
+                    .ue2 => &ue2.cpu.generic,
 
                     else => &S.generic_model,
                 };
@@ -1710,6 +1719,7 @@ pub const Target = struct {
                 .loongarch32,
                 .loongarch64,
                 .xtensa,
+                .ue2,
                 => return result,
             },
 
@@ -1795,6 +1805,7 @@ pub const Target = struct {
             .avr => 1,
             .msp430 => 2,
             .xcore => 4,
+            .ue2 => 1,
 
             .arm,
             .armeb,
@@ -1952,6 +1963,8 @@ pub const Target = struct {
             .spirv64,
             .loongarch64,
             => return 64,
+
+            .ue2 => return 12,
 
             .sparc => return if (std.Target.sparc.featureSetHas(target.cpu.features, .v9)) 64 else 32,
         }
@@ -2424,6 +2437,7 @@ pub const Target = struct {
 
                 .msp430,
                 .avr,
+                .ue2,
                 => 2,
 
                 .arc,

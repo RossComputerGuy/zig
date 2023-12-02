@@ -103,6 +103,7 @@ pub fn targetTriple(allocator: Allocator, target: std.Target) ![]const u8 {
         .renderscript64 => "renderscript64",
         .ve => "ve",
         .spu_2 => return error.@"LLVM backend does not support SPU Mark II",
+        .ue2 => return error.@"LLVM backend does not support UE-2",
     };
     try llvm_triple.appendSlice(llvm_arch);
     try llvm_triple.appendSlice("-unknown-");
