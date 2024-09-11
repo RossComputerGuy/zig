@@ -2,6 +2,7 @@ const builtin = @import("builtin");
 const std = @import("std.zig");
 const math = std.math;
 const mem = std.mem;
+const heap = std.heap;
 const io = std.io;
 const posix = std.posix;
 const fs = std.fs;
@@ -956,7 +957,7 @@ fn printLineFromFileAnyOs(out_stream: anytype, source_location: SourceLocation) 
     defer f.close();
     // TODO fstat and make sure that the file has the correct size
 
-    var buf: [mem.page_size]u8 = undefined;
+    var buf: [heap.min_page_size]u8 align(heap.min_page_size) = undefined;
     var amt_read = try f.read(buf[0..]);
     const line_start = seek: {
         var current_line_start: usize = 0;
@@ -1059,7 +1060,7 @@ test printLineFromFileAnyOs {
 
         const overlap = 10;
         var writer = file.writer();
-        try writer.writeByteNTimes('a', mem.page_size - overlap);
+        try writer.writeByteNTimes('a', heap.min_page_size - overlap);
         try writer.writeByte('\n');
         try writer.writeByteNTimes('a', overlap);
 
@@ -1074,10 +1075,10 @@ test printLineFromFileAnyOs {
         defer allocator.free(path);
 
         var writer = file.writer();
-        try writer.writeByteNTimes('a', mem.page_size);
+        try writer.writeByteNTimes('a', heap.max_page_size);
 
         try printLineFromFileAnyOs(output_stream, .{ .file_name = path, .line = 1, .column = 0 });
-        try expectEqualStrings(("a" ** mem.page_size) ++ "\n", output.items);
+        try expectEqualStrings(("a" ** heap.max_page_size) ++ "\n", output.items);
         output.clearRetainingCapacity();
     }
     {
@@ -1087,18 +1088,18 @@ test printLineFromFileAnyOs {
         defer allocator.free(path);
 
         var writer = file.writer();
-        try writer.writeByteNTimes('a', 3 * mem.page_size);
+        try writer.writeByteNTimes('a', 3 * heap.max_page_size);
 
         try expectError(error.EndOfFile, printLineFromFileAnyOs(output_stream, .{ .file_name = path, .line = 2, .column = 0 }));
 
         try printLineFromFileAnyOs(output_stream, .{ .file_name = path, .line = 1, .column = 0 });
-        try expectEqualStrings(("a" ** (3 * mem.page_size)) ++ "\n", output.items);
+        try expectEqualStrings(("a" ** (3 * heap.max_page_size)) ++ "\n", output.items);
         output.clearRetainingCapacity();
 
         try writer.writeAll("a\na");
 
         try printLineFromFileAnyOs(output_stream, .{ .file_name = path, .line = 1, .column = 0 });
-        try expectEqualStrings(("a" ** (3 * mem.page_size)) ++ "a\n", output.items);
+        try expectEqualStrings(("a" ** (3 * heap.max_page_size)) ++ "a\n", output.items);
         output.clearRetainingCapacity();
 
         try printLineFromFileAnyOs(output_stream, .{ .file_name = path, .line = 2, .column = 0 });
@@ -1112,7 +1113,7 @@ test printLineFromFileAnyOs {
         defer allocator.free(path);
 
         var writer = file.writer();
-        const real_file_start = 3 * mem.page_size;
+        const real_file_start = 3 * heap.min_page_size;
         try writer.writeByteNTimes('\n', real_file_start);
         try writer.writeAll("abc\ndef");
 
