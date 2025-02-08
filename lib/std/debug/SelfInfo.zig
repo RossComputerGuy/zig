@@ -146,6 +146,8 @@ pub fn getModuleNameForAddress(self: *SelfInfo, address: usize) ?[]const u8 {
         return self.lookupModuleNameWin32(address);
     } else if (native_os == .haiku) {
         return null;
+    } else if (native_os == .uefi) {
+        return null;
     } else if (builtin.target.isWasm()) {
         return null;
     } else {
